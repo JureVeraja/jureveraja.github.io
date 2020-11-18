@@ -8,6 +8,6 @@ toc: false
 ---
 
 test
-(../assets/img/sample/upload-image.png)
+(./assets/img/sample/upload-image.png)
 
 slika
