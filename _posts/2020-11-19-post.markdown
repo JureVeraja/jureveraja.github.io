@@ -8,6 +8,6 @@ toc: false
 ---
 
 test
-![upload-image](/assets/img/sample/upload-image.png) {: width="350" class="normal"}
+![upload-image](/assets/img/sample/upload-image.png){: width="350" class="normal"}
 
 slika
