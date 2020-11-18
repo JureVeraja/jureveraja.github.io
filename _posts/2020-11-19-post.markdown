@@ -8,6 +8,6 @@ toc: false
 ---
 
 test
-![upload-image](https://github.com/JureVeraja/jureveraja.github.io/blob/master/assets/img/sample/upload-image.png)
+![upload-image](/assets/img/sample/upload-image.png)
 
 slika
