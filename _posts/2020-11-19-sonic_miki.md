@@ -36,6 +36,10 @@ Difference between Agressive and Main mode is that Aggressive sends fewer messag
 
 So to conclude, Agressive Mode is not as secure as Main Mode, but it is faster. Also it is mostly used when one of the peers have dynamic external ip address.
 
+Next, on the `Advanced` under the `Peers` we set our ID to user fqdn, with this ID we will present ourselves to the peer. You can type any value here. The reason i use `user fqdn` is the same reason im using Agressive mode. I've had problems with establishing connections while using different ID types.
+![miki_peer2](/assets/img/sample/miki_peer2.png)
+
+
 
 
 
