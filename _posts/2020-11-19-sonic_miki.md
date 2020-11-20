@@ -18,8 +18,9 @@ Lets head over to the tab `IP -> IPsec -> Peer Profiles` and configure the profi
 
 Choose the encryption/hashing method along with Diffie Helman group (DH) which best suits your needs and your environment.
 
-NAT traversal allows systems behind NATs to request and establish secure connections on demand,and in order to have ESP packets traverse NAT.
-(DPD) Dead Peer Detection is a method of detecting a dead Internet Key Exchange (IKE) peer. For example there can be situations where two peers loose connectivity to each other but they can't identify the loss of connectivity because the Security Associations which were formed during the PHASE1 negotiation remain in the UP state until their lifetime timer expires. What happens in this case is the traffic is then routed through the tunnel which actually doesn't exist.
+`NAT traversal` allows systems behind NATs to request and establish secure connections on demand,and in order to have ESP packets traverse NAT.
+
+`(DPD) Dead Peer Detection` is a method of detecting a dead Internet Key Exchange (IKE) peer. For example there can be situations where two peers loose connectivity to each other but they can't identify the loss of connectivity because the Security Associations (SA) which were formed during the PHASE1 negotiation remain in the UP state until their lifetime timer expires. What happens in this case is the traffic is then routed through the tunnel which actually doesn't exist.
 
 After this lets go to the `Peers` tab and configure our peer which in this case would be Sonicwall.
 
