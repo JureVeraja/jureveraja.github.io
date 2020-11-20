@@ -47,6 +47,7 @@ After this we will go to the `Policy Proposals` tab. Here we will configure encr
 Now we come to the point where we need to specify what traffic we want to send through the IPSec tunnel. Go to the `Policies` tab and add the `Source Address` (traffic from your site which you want tunneled) , and the `Destination Address` (traffic at the remote site with which you want to communicate) in our case network.
 ![miki_policy1](/assets/img/sample/miki_policy1.png)
 On the `Action` tab window, for Action: specify `encrypt`, meaning the traffic from your network to remote network will be encrypted. Set Level: to `unique` for the situations when you are having multiple subnets crossing the tunnel. If you leave it at Level: `require`, only the first policy will match and be pushed through the tunnel. For IPsec Protocols: use `esp`, and use the `Tunnel` mode which encrypts whole IP packet.
+
 ![miki_policy2](/assets/img/sample/miki_policy2.png)
 
 
