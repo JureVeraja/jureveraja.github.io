@@ -69,13 +69,19 @@ End result should show that our tunnels are established after we configure Sonic
 
 Now lets head over to the Sonicwall. Here assume you've got some static Public ip address configured which we specified before as our Peer Address on Mikrotik.
 
-First lets create Address Object for the Destination Network which we want to reach, in our case its the Mikrotik's LAN (10.20.10.0/24).
+First lets create `Address Object` for the Destination Network which we want to reach, in our case its the Mikrotik's LAN (10.20.10.0/24).
 
 ![sonic_miki2](/assets/img/sample/sonic_miki2.png)
 
-Then we also create Address Object for our Local Networks and Group them under our VPN group object which we want reachable from the Mikrotik (the ones configured on Mikrotik IPsec policies).
+Then we also create Address Object for our Local Networks and Group them under our `VPN group` object which we want reachable from the Mikrotik (the ones configured on Mikrotik IPsec policies).
 
 ![sonicwall_vpnobject](/assets/img/sample/sonicwall_vpnobject.png)
+
+After this we go to `VPN` tab and under `Base Settings` click add to create new VPN tunnel. Choose Site-to-Site using preshared key. Insert the name you want, and in this case since Mikrotik doesnt have public static ip address, we will use 0.0.0.0 , meaning we accept any connections with valid key and proposals.
+
+Next you specify the shared secret and IDs. Under `Peer ID` choose e-mail and insert the same ID we've configured on Mikrotik (fqdn).
+
+![sonicwall_general](/assets/img/sample/sonicwall_general.png)
 
 
 
