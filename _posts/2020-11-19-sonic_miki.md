@@ -97,6 +97,8 @@ After that our tunnels should be up, you should see green circle under the VPN i
 
 ![sonic_green](/assets/img/sample/sonic_green.png)
 
+Hope you enjoyed reading this and that it helped you, thanks!
+
 
 
 
