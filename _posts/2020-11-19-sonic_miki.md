@@ -83,6 +83,11 @@ Next you specify the shared secret and IDs. Under `Peer ID` choose e-mail and in
 
 ![sonicwall_general](/assets/img/sample/sonicwall_general.png)
 
+On the `Network` tab, choose your Local Network which you want to be accessible from remote locations. Before we created VPN group object. And for Remote Networks choose the Mikrotik's LAN.
+
+![sonicwall_network](/assets/img/sample/sonicwall_network.png)
+
+Under the `Proposals` tab, settings must be same on both sides for both Phases which we explained before. So choose Aggressive Mode, DH Group: 2 which is equivalent to mikrotics 1024bit group. Next is encryption and hashing, we used aes-256 and sha256 with protocol ESP. Lifetime stays the default which is 8 hours.
 
 
 
