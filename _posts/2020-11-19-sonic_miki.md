@@ -52,6 +52,10 @@ On the `Action` tab window, for Action: specify `encrypt`, meaning the traffic f
 
 ![miki_policy2](/assets/img/sample/miki_policy2.png)
 
+End result should show that our tunnels are established after we configure Sonicwall.
+
+![miki_policies](/assets/img/sample/miki_policies.png)
+
 
 
 
