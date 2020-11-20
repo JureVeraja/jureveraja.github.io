@@ -73,6 +73,12 @@ First lets create Address Object for the Destination Network which we want to re
 
 ![sonic_miki2](/assets/img/sample/sonic_miki2.png)
 
+Then we also create Address Object for our Local Networks and Group them under our VPN group object which we want reachable from the Mikrotik (the ones configured on Mikrotik IPsec policies).
+
+![sonicwall_vpnobject](/assets/img/sample/sonicwall_vpnobject.png)
+
+
+
 
 
 
