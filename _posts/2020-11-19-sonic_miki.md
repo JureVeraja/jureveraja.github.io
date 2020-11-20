@@ -67,6 +67,13 @@ End result should show that our tunnels are established after we configure Sonic
 
 ![miki_firewallnonat](/assets/img/sample/miki_firewallnonat.png)
 
+Now lets head over to the Sonicwall. Here assume you've got some static Public ip address configured which we specified before as our Peer Address on Mikrotik.
+
+First lets create Address Object for the Destination Network which we want to reach, in our case its the Mikrotik's LAN (10.20.10.0/24).
+
+![sonic_miki](/assets/img/sample/sonic_miki.png)
+
+
 
 
 
