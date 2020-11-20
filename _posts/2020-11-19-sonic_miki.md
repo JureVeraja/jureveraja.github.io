@@ -39,6 +39,8 @@ So to conclude, Agressive Mode is not as secure as Main Mode, but it is faster. 
 Next, on the `Advanced` under the `Peers` we set our ID to user fqdn, with this ID we will present ourselves to the peer. You can type any value here. The reason i use `user fqdn` is the same reason im using Agressive mode. I've had problems with establishing connections while using different ID types. Also set the "send initial contact" if you're using dynamic ip address at this location, and you are initiating a connection to a sonicwall which has static public ip address.
 ![miki_peer2](/assets/img/sample/miki_peer2.png)
 
+After this we will go to the `Policy Proposals` tab. Here we will configure encryption/hashing policy that the peers will use for Phase 2 negotiation. Phase 1 negotiates a security association (SA) between two IKE peers, which enables the peers to communicate securely in Phase 2 and for IPSec SA's. Both sides must have the same matching values.
+
 
 
 
