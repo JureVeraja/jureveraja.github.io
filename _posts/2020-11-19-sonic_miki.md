@@ -89,6 +89,10 @@ On the `Network` tab, choose your Local Network which you want to be accessible 
 
 Under the `Proposals` tab, settings must be same on both sides for both Phases which we explained before. So choose Aggressive Mode, DH Group: 2 which is equivalent to mikrotics 1024bit group. Next is encryption and hashing, we used aes-256 and sha256 with protocol ESP. Lifetime stays the default which is 8 hours.
 
+After that our tunnels should be up, you should see green circle under the VPN in sonicwall.
+
+![sonic_green](/assets/img/sample/sonic_green.png)
+
 
 
 
