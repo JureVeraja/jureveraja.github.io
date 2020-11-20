@@ -40,6 +40,7 @@ Next, on the `Advanced` under the `Peers` we set our ID to user fqdn, with this 
 ![miki_peer2](/assets/img/sample/miki_peer2.png)
 
 After this we will go to the `Policy Proposals` tab. Here we will configure encryption/hashing policy that the peers will use for Phase 2 negotiation. Phase 1 negotiates a security association (SA) between two IKE peers, which enables the peers to communicate securely in Phase 2 and for IPSec SA's. Both sides must have the same matching values.
+![miki_policyproposal](/assets/img/sample/miki_policyproposal.png)
 
 
 
