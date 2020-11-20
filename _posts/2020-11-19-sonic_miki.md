@@ -28,7 +28,7 @@ After this lets go to the `Peers` tab and configure our peer which in this case 
 
 We specify the ip address of our remote peer, along with the Profile we just created in the step before. 
 In our example we are using Authentication Method with pre shared key. 
-For Exchange Mode and compatibility with Sonicwall i've had most success with Agressive mode, for whatever reason sometimes my tunnels would not establish using Main mode.
+For Exchange Mode and compatibility with Sonicwall i've had most success with `Agressive mode`, for whatever reason sometimes my tunnels would not establish using `Main mode`.
 
 To sucessfuly and securely communicate using IPsec, the IKE is using two-step negotiation. Main mode or Aggressive mode (Phase 1) which authenticates and/or encrypts the peers. And Quick Mode (Phase 2) which negotiates and agrees on which traffic will be sent across the VPN.
 
