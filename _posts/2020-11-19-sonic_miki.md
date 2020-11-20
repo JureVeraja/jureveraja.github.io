@@ -71,7 +71,7 @@ Now lets head over to the Sonicwall. Here assume you've got some static Public i
 
 First lets create Address Object for the Destination Network which we want to reach, in our case its the Mikrotik's LAN (10.20.10.0/24).
 
-![sonic_miki](/assets/img/sample/sonic_miki.png =600x600) { width: 200px; }
+![sonic_miki](/assets/img/sample/sonic_miki.png) { width: 200px; }
 
 
 
