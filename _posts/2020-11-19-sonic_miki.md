@@ -52,11 +52,20 @@ On the `Action` tab window, for Action: specify `encrypt`, meaning the traffic f
 
 ![miki_policy2](/assets/img/sample/miki_policy2.png)
 
-Theres two more important parts which we need to configure before our tunnels are established. That is firewall rules to allow and open ports for IPsec functions and traffic.  `UDP 500` for key setup if you use IKE. NAT-T UDP Encapsulation is using `UDP 4500`. You should also enable `IPsec-ESP Protocol 50` which are the packets transporting the actual payload. Altough there are some situations where you don't need to specifically allow ESP-50 depending on your firewall rule setup. For example when you have the rule in `chain input` with `filter accept` for packets belonging to `established` or `related` connections, and since you've might allow both peers to initiate the connection rather than passively respond incoming connections, both send packets to each other from the same UDP ports on which they listen (500), and then at Mikrotik side, the initial packet from the Sonicwall is treated as if it belonged to the connection initiated by the Mikrotik itself.
+Theres two more important parts which we need to configure before our tunnels are established. First one is to create firewall rules to allow and open ports for IPsec functions and traffic.  `UDP 500` for key setup if you use IKE. NAT-T UDP Encapsulation is using `UDP 4500`. You should also enable `IPsec-ESP Protocol 50` which are the packets transporting the actual payload. Altough there are some situations where you don't need to specifically allow ESP-50 depending on your firewall rule setup. For example when you have the rule in `chain input` with `filter accept` for packets belonging to `established` or `related` connections, and since you've might allow both peers to initiate the connection rather than passively respond incoming connections, both send packets to each other from the same UDP ports on which they listen (500), and then at Mikrotik side, the initial packet from the Sonicwall is treated as if it belonged to the connection initiated by the Mikrotik itself.
+
+![miki_firewall](/assets/img/sample/miki_firewall.png)
+
+Second one is to create NAT rules or should i say NO-NAT rules for the traffic/packets that should be sent to remote networks. Normally when we are leaving our LAN, and going to the outside locations, our traffic is NAT-ed (Masquerade). But in this case we dont want to NAT our packets which are going to the remote networks, because if they are NAT-ed then the IPsec policies would not match.
+
+![miki_firewallnonat](/assets/img/sample/miki_firewallnonat.png)
+
+
+
 
 End result should show that our tunnels are established after we configure Sonicwall.
 
-![miki_policiess](/assets/img/sample/miki_policiess.png)
+![miki_firewallnonat](/assets/img/sample/miki_firewallnonat.png)
 
 
 
