@@ -29,7 +29,13 @@ We specify the ip address of our remote peer, along with the Profile we just cre
 In our example we are using Authentication Method with pre shared key. 
 For Exchange Mode and compatibility with Sonicwall i've had most success with Agressive mode, for whatever reason sometimes my tunnels would not establish using Main mode.
 
-To sucessfuly and securely communicate using IPsec, the IKE is using two-step negotiation. Main mode or Aggressive mode (Phase 1) which authenticates and/or encrypts the peers. 
+To sucessfuly and securely communicate using IPsec, the IKE is using two-step negotiation. Main mode or Aggressive mode (Phase 1) which authenticates and/or encrypts the peers. And Quick Mode (Phase 2) which negotiates and agrees on which traffic will be sent across the VPN.
+
+Difference between Agressive and Main mode is that Aggressive sends fewer messages (packet exchanges)(3) while Main mode requires 6 messages. during phase 1 negotiation. Also Agressive mode does not provide Peer Identity Protection, meaning the peers exchange their identity without encryption, unless certificates are used.
+
+So to conclude, Agressive Mode is not as secure as Main Mode, but it is faster. Also it is mostly used when one of the peers have dynamic external ip address.
+
+
 
 
 
