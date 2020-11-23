@@ -70,7 +70,7 @@ Second one is to create NAT rules or should i say NO-NAT rules for the traffic/p
 
 End result should show that our tunnels are established after we configure Sonicwall.
 
-![miki_firewallnonat](/assets/img/sample/miki_firewallnonat.png)
+![miki_policiess](/assets/img/sample/miki_policiess.png)
 
 ### SONICWALL
 
