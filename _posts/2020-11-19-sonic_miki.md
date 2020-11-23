@@ -16,6 +16,7 @@ These are addresses on Mikrotik interfaces.
 ![miki_address](/assets/img/sample/miki_address.png)
 
 Lets head over to the tab `IP -> IPsec -> Peer Profiles` and configure the profile in which we will specify the encryption/hashing method which will be used to setup Phase 1 secure tunnel in which two peers will negotiate.
+
 ![miki_peerprofile](/assets/img/sample/miki_peerprofile.png)
 
 Choose the encryption/hashing method along with Diffie Helman group (DH) which best suits your needs and your environment.
