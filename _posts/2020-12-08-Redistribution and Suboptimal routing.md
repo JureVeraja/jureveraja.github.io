@@ -71,7 +71,8 @@ EIGRP uses a metric that is based on bandwidth, delay, reliability, load, and MT
 
 So in our example we used 1 for bandwith, 1 for delay, 255 for reliability, 1 for load, and 1500 our usual MTU. 
 
-```R2(config-router)#redistribute rip metric ?
+```
+R2(config-router)#redistribute rip metric ?
   <1-4294967295>  Bandwidth metric in Kbits per second
 ```
 
