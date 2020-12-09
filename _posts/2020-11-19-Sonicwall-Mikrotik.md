@@ -10,7 +10,7 @@ In this post i will show you how to configure IPsec tunnel between Sonicwall and
 
 I assume you have some knowledge of RouterOS so lets first do the configuration on Mikrotik first.
 
-### MIKROTIK
+# MIKROTIK
 
 These are addresses on Mikrotik interfaces.
 ![miki_address](/assets/img/sample/miki_address.png)
@@ -72,7 +72,7 @@ End result should show that our tunnels are established after we configure Sonic
 
 ![miki_policiess](/assets/img/sample/miki_policiess.png)
 
-### SONICWALL
+# SONICWALL
 
 Now lets head over to the Sonicwall. Here assume you've got some static Public ip address configured which we specified before as our Peer Address on Mikrotik.
 
