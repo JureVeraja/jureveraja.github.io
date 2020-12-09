@@ -99,14 +99,14 @@ R2(config-router)#redistribute rip metric 1 1 255 1 ?
 
 In our topology example it doesn't matter the actual metric the EIGRP calculates from the given values, but in your example it might be different so you can tweak it alittle bit.
 
-Once we redistributed, we can head over to Router 4 and 5 to check their routing table and their EIGRP config:
+After redistribution we can head over to R4 and R5 to check the routes they received:
   
 ### Router 4 EIGRP route and configuration
 
 ```
 router eigrp 1
  network 10.0.0.0
-```
+ ```
 
 ```
 D EX     150.1.1.0 
@@ -115,7 +115,8 @@ D EX     150.1.1.0
 
 ### Router 5 EIGRP route configuration
 
-```router eigrp 1
+```
+router eigrp 1
  network 10.0.0.0
 ```
 
