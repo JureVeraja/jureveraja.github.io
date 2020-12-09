@@ -53,9 +53,9 @@ router rip
 R    150.1.1.0 [120/1] via 10.10.1.1, 00:00:09, GigabitEthernet2/0
 ```
 
-### Redistribute RIP into EIGRP
+# Redistribute RIP into EIGRP
 
-# Router 2 EIGRP config: 
+### Router 2 EIGRP config: 
 
 ```
 !
@@ -118,7 +118,7 @@ So in our example we used 1 for bandwith, 1 for delay, 255 for reliability, 1 fo
 
 And we succesfully redistributed from RIP to EIGRP. Notice the EIGRP external route code "D EX" and AD is 170 which is default AD for EIGRP external routes.
 
-### Redistribute EIGRP into OSPF
+# Redistribute EIGRP into OSPF
 
 Lets go to ospf process on both router 4 and 5 and configure the OSPF process and redistribute EIGPR into OSPF.
 ```router ospf 1
