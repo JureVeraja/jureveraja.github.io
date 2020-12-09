@@ -65,7 +65,7 @@ router eigrp 1
  redistribute rip metric 1 1 255 1 1500
 ```
 
-To redistribute RIP into EIGRP, EIGRP requires that you set the SEED metric, othervise the EIGRP would use the inifity SEED metric which is the default when you redistribute into EIGRP. 
+To redistribute RIP into EIGRP, EIGRP requires that you set the SEED metric, othervise the EIGRP would use the inifity `SEED` metric which is the default when you redistribute into EIGRP. 
 
 EIGRP uses a metric that is based on bandwidth, delay, reliability, load, and MTU.
 
@@ -95,11 +95,11 @@ So in our example we used 1 for bandwith, 1 for delay, 255 for reliability, 1 fo
   <1-65535>  EIGRP MTU of the path
 ```
 
-  In our topology example it doesn't matter the actual metric the EIGRP calculates from the given values, but in your example it might be different so you can tweak it alittle bit.
+In our topology example it doesn't matter the actual metric the EIGRP calculates from the given values, but in your example it might be different so you can tweak it alittle bit.
 
-  Once we redistributed, we can head over to Router 4 and 5 to check their routing table and their EIGRP config:
+Once we redistributed, we can head over to Router 4 and 5 to check their routing table and their EIGRP config:
   
-### Router 4
+### Router 4 EIGRP route and configuration
 
 ```router eigrp 1
  network 10.0.0.0
@@ -109,12 +109,14 @@ So in our example we used 1 for bandwith, 1 for delay, 255 for reliability, 1 fo
            [170/2560000512] via 10.10.2.2, GigabitEthernet0/0
 ```
 
-### Router 5
+### Router 5 EIGRP route configuration
 
 ```router eigrp 1
- network 10.0.0.0```
+ network 10.0.0.0
+```
 
-```D EX     150.1.1.0 
+```
+D EX     150.1.1.0 
            [170/2560000512] via 10.10.3.2, GigabitEthernet1/0
 ```
 
@@ -124,22 +126,25 @@ And we succesfully redistributed from RIP to EIGRP. Notice the EIGRP external ro
 
 Lets go to ospf process on both router 4 and 5 and configure the OSPF process and redistribute EIGPR into OSPF.
 
-```router ospf 1
+```
+router ospf 1
  redistribute eigrp 1 subnets
 ```
 
- Remember you have to insert subnets keyword in the end othervise only classful network would be advertised.
+Remember you have to insert subnets keyword in the end othervise only classful network would be advertised.
  
- After you've redistributed on both R4 and R5 you can check the routing table:
+After you've redistributed on both R4 and R5 you can check the routing table:
 
  ### Router 4
 
-```O E2  150.1.1.0 [110/20] via 10.10.4.5, GigabitEthernet2/0
+```
+O E2  150.1.1.0 [110/20] via 10.10.4.5, GigabitEthernet2/0
 ```
 
 ### Router 5
 
-```D EX   150.1.1.0 
+```
+D EX   150.1.1.0 
            [170/2560000512] via 10.10.3.2, GigabitEthernet1/0
 ```
 
