@@ -49,7 +49,7 @@ router rip
 
  We can see the routing table on R2 and verify that R1-R2 are doing RIP. We can see the route learned from R1.
 
- ```150.1.0.0/24 is subnetted, 1 subnets
+``` 150.1.0.0/24 is subnetted, 1 subnets
 R    150.1.1.0 [120/1] via 10.10.1.1, 00:00:09, GigabitEthernet2/0
 ```
 
