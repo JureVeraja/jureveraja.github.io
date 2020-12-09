@@ -55,7 +55,7 @@ R    150.1.1.0 [120/1] via 10.10.1.1, 00:00:09, GigabitEthernet2/0
 
 ### Redistribute RIP into EIGRP
 
-Router 2 EIGRP config: 
+# Router 2 EIGRP config: 
 
 ```
 !
@@ -75,39 +75,46 @@ So in our example we used 1 for bandwith, 1 for delay, 255 for reliability, 1 fo
 ```
 
 ```R2(config-router)#redistribute rip metric 1 ?
+
   <0-4294967295>  EIGRP delay metric, in 10 microsecond units
 ```
 
 ```R2(config-router)#redistribute rip metric 1 1 ?
+
   <0-255>  EIGRP reliability metric where 255 is 100% reliable
 ```
 
-  ```R2(config-router)#redistribute rip metric 1 1 255 ?
+```R2(config-router)#redistribute rip metric 1 1 255 ?
+  
   <1-255>  EIGRP Effective bandwidth metric (Loading) where 255 is 100% loaded
 ```
 
-  ```R2(config-router)#redistribute rip metric 1 1 255 1 ?
+```R2(config-router)#redistribute rip metric 1 1 255 1 ?
+  
   <1-65535>  EIGRP MTU of the path
 ```
 
   In our topology example it doesn't matter the actual metric the EIGRP calculates from the given values, but in your example it might be different so you can tweak it alittle bit.
 
   Once we redistributed, we can head over to Router 4 and 5 to check their routing table and their EIGRP config:
-###Router 4
+  
+### Router 4
 
 ```router eigrp 1
  network 10.0.0.0```
 
 ```D EX     150.1.1.0 
-           [170/2560000512] via 10.10.2.2, GigabitEthernet0/0```
+           [170/2560000512] via 10.10.2.2, GigabitEthernet0/0
+```
 
-###Router 5
+### Router 5
 
 ```router eigrp 1
  network 10.0.0.0```
 
 ```D EX     150.1.1.0 
-           [170/2560000512] via 10.10.3.2, GigabitEthernet1/0```
+           [170/2560000512] via 10.10.3.2, GigabitEthernet1/0
+```
 
 And we succesfully redistributed from RIP to EIGRP. Notice the EIGRP external route code "D EX" and AD is 170 which is default AD for EIGRP external routes.
 
@@ -115,20 +122,23 @@ And we succesfully redistributed from RIP to EIGRP. Notice the EIGRP external ro
 
 Lets go to ospf process on both router 4 and 5 and configure the OSPF process and redistribute EIGPR into OSPF.
 ```router ospf 1
- redistribute eigrp 1 subnets```
+ redistribute eigrp 1 subnets
+```
 
  Remember you have to insert subnets keyword in the end othervise only classful network would be advertised.
  
  After you've redistributed on both R4 and R5 you can check the routing table:
 
- ###Router 4
+ ### Router 4
 
- ```O E2  150.1.1.0 [110/20] via 10.10.4.5, GigabitEthernet2/0```
+ ```O E2  150.1.1.0 [110/20] via 10.10.4.5, GigabitEthernet2/0
+```
 
-###Router 5
+### Router 5
 
 ```D EX   150.1.1.0 
-           [170/2560000512] via 10.10.3.2, GigabitEthernet1/0```
+           [170/2560000512] via 10.10.3.2, GigabitEthernet1/0
+```
 
 Now a couple of interesting things happened here:
 
