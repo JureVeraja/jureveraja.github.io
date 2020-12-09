@@ -29,7 +29,7 @@ router rip
  network 150.1.0.0
  no auto-summary
  ```
- ------------------------------
+
  ```
 hostname R2
 !
@@ -101,7 +101,8 @@ So in our example we used 1 for bandwith, 1 for delay, 255 for reliability, 1 fo
 ### Router 4
 
 ```router eigrp 1
- network 10.0.0.0```
+ network 10.0.0.0
+```
 
 ```D EX     150.1.1.0 
            [170/2560000512] via 10.10.2.2, GigabitEthernet0/0
@@ -121,6 +122,7 @@ And we succesfully redistributed from RIP to EIGRP. Notice the EIGRP external ro
 # Redistribute EIGRP into OSPF
 
 Lets go to ospf process on both router 4 and 5 and configure the OSPF process and redistribute EIGPR into OSPF.
+
 ```router ospf 1
  redistribute eigrp 1 subnets
 ```
@@ -131,7 +133,7 @@ Lets go to ospf process on both router 4 and 5 and configure the OSPF process an
 
  ### Router 4
 
- ```O E2  150.1.1.0 [110/20] via 10.10.4.5, GigabitEthernet2/0
+```O E2  150.1.1.0 [110/20] via 10.10.4.5, GigabitEthernet2/0
 ```
 
 ### Router 5
