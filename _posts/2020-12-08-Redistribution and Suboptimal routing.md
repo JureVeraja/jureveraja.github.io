@@ -71,19 +71,24 @@ EIGRP uses a metric that is based on bandwidth, delay, reliability, load, and MT
 So in our example we used 1 for bandwith, 1 for delay, 255 for reliability, 1 for load, and 1500 our usual MTU. 
 
 ```R2(config-router)#redistribute rip metric ?
-  <1-4294967295>  Bandwidth metric in Kbits per second```
+  <1-4294967295>  Bandwidth metric in Kbits per second
+```
 
 ```R2(config-router)#redistribute rip metric 1 ?
-  <0-4294967295>  EIGRP delay metric, in 10 microsecond units```
+  <0-4294967295>  EIGRP delay metric, in 10 microsecond units
+```
 
 ```R2(config-router)#redistribute rip metric 1 1 ?
-  <0-255>  EIGRP reliability metric where 255 is 100% reliable```
+  <0-255>  EIGRP reliability metric where 255 is 100% reliable
+```
 
   ```R2(config-router)#redistribute rip metric 1 1 255 ?
-  <1-255>  EIGRP Effective bandwidth metric (Loading) where 255 is 100% loaded```
+  <1-255>  EIGRP Effective bandwidth metric (Loading) where 255 is 100% loaded
+```
 
   ```R2(config-router)#redistribute rip metric 1 1 255 1 ?
-  <1-65535>  EIGRP MTU of the path```
+  <1-65535>  EIGRP MTU of the path
+```
 
   In our topology example it doesn't matter the actual metric the EIGRP calculates from the given values, but in your example it might be different so you can tweak it alittle bit.
 
