@@ -77,19 +77,23 @@ R2(config-router)#redistribute rip metric ?
   <1-4294967295>  Bandwidth metric in Kbits per second
 ```
 
-```R2(config-router)#redistribute rip metric 1 ?
+```
+R2(config-router)#redistribute rip metric 1 ?
     <0-4294967295>  EIGRP delay metric, in 10 microsecond units
 ```
 
-```R2(config-router)#redistribute rip metric 1 1 ?
+```
+R2(config-router)#redistribute rip metric 1 1 ?
     <0-255>  EIGRP reliability metric where 255 is 100% reliable
 ```
 
-```R2(config-router)#redistribute rip metric 1 1 255 ?
+```
+R2(config-router)#redistribute rip metric 1 1 255 ?
     <1-255>  EIGRP Effective bandwidth metric (Loading) where 255 is 100% loaded
 ```
 
-```R2(config-router)#redistribute rip metric 1 1 255 1 ?
+```
+R2(config-router)#redistribute rip metric 1 1 255 1 ?
     <1-65535>  EIGRP MTU of the path
 ```
 
