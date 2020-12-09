@@ -140,7 +140,7 @@ Remember you have to insert subnets keyword in the end othervise only classful n
  
 After you've redistributed on both R4 and R5 you can check the routing table:
 
- ### Router 4
+### Router 4
 
 ```
 O E2  150.1.1.0 [110/20] via 10.10.4.5, GigabitEthernet2/0
