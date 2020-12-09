@@ -14,6 +14,7 @@ We will use this topology example, all ip addresses have been marked:
 ![redistribution](/assets/img/sample/redistribution.png)
 
 We will first check the configuration on R1 and R2 and then redistribute the Loopback network from RIP into EIGRP and then into OSPF. 
+
 ```
 hostname R1               
 !
@@ -28,9 +29,9 @@ router rip
  network 10.0.0.0
  network 150.1.0.0
  no auto-summary
- ```
+```
 
- ```
+```
 hostname R2
 !
 interface GigabitEthernet0/0
@@ -45,9 +46,9 @@ interface GigabitEthernet1/0
 router rip
  version 2
  network 10.0.0.0
- ```
+```
 
- We can see the routing table on R2 and verify that R1-R2 are doing RIP. We can see the route learned from R1.
+We can see the routing table on R2 and verify that R1-R2 are doing RIP. We can see the route learned from R1.
 
 ``` 
   150.1.0.0/24 is subnetted, 1 subnets
@@ -77,23 +78,19 @@ R2(config-router)#redistribute rip metric ?
 ```
 
 ```R2(config-router)#redistribute rip metric 1 ?
-
-  <0-4294967295>  EIGRP delay metric, in 10 microsecond units
+    <0-4294967295>  EIGRP delay metric, in 10 microsecond units
 ```
 
 ```R2(config-router)#redistribute rip metric 1 1 ?
-
-  <0-255>  EIGRP reliability metric where 255 is 100% reliable
+    <0-255>  EIGRP reliability metric where 255 is 100% reliable
 ```
 
 ```R2(config-router)#redistribute rip metric 1 1 255 ?
-  
-  <1-255>  EIGRP Effective bandwidth metric (Loading) where 255 is 100% loaded
+    <1-255>  EIGRP Effective bandwidth metric (Loading) where 255 is 100% loaded
 ```
 
 ```R2(config-router)#redistribute rip metric 1 1 255 1 ?
-  
-  <1-65535>  EIGRP MTU of the path
+    <1-65535>  EIGRP MTU of the path
 ```
 
 In our topology example it doesn't matter the actual metric the EIGRP calculates from the given values, but in your example it might be different so you can tweak it alittle bit.
