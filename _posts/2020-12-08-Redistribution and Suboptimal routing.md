@@ -45,6 +45,7 @@ interface GigabitEthernet1/0
 router rip
  version 2
  network 10.0.0.0
+ ```
 
  We can see the routing table on R2 and verify that R1-R2 are doing RIP. We can see the route learned from R1.
 
