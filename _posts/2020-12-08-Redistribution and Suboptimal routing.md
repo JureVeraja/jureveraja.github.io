@@ -3,7 +3,7 @@ title: Redistribution between Routing Protocols and Suboptimal Routing
 author: Jure Veraja
 date: 2020-12-09 18:33:00 +0100
 categories: [enterprise routing and services - CCNP ENARSI]
-tags: [redistribution,suboptimal routing]
+tags: [redistribution,suboptimal-routing]
 math: true
 ---
 
