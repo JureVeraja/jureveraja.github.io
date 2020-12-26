@@ -10,7 +10,7 @@ math: true
 To continue based on the previous post about Redistribution between Routing Protocols and Suboptimal Routing.
 Here we will try to resolve the issue we encountered while redistributing from EIGRP into OSPF and we will also
 introduce new issue which happens if we redistribute back from OSPF into the EIGRP domain.
-We will use the same topology as last time except the addition of R3 which will do redistribution from RIP into EIGRP.
+We will use the same topology as last time except the addition of R3,just for the sake of RIP redistribution.
 
 ![redistribution2](/assets/img/sample/redistribution2.png)
 
