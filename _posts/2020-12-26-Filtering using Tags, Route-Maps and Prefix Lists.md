@@ -138,8 +138,68 @@ D EX     150.1.1.0 [170/26368] via 10.10.3.3, 00:09:34, GigabitEthernet1/0
 ```
 # FILTERING ROUTES BY USING TAG AND ROUTE-MAPs
 
+So we must tag the routes coming from the EIGRP into the OSPF. First we will create ACL to match the route we want to tag (we can also do it with ip prefix-list command). After that we will match that ACL in the route-map, and then we will insert the route-map into the OSPF routing process.
 
+```
+R4(config)#access-list 1 permit 150.1.1.0 0.0.0.255
+R4(config)#route-map TAG_EIGRP_TO_OSPF permit 10
+R4(config-route-map)#match ip address 1
+R4(config-route-map)#set tag 100
+R4(config)#route-map TAG_EIGRP_TO_OSPF permit 20
+R5(config)#router ospf 1
+R4(config)#redistribute eigrp 1 subnets route-map TAG_EIGRP_TO_OSPF
 
+R5(config)#access-list 1 permit 150.1.1.0 0.0.0.255
+R5(config)#route-map TAG_EIGRP_TO_OSPF permit 10
+R5(config-route-map)#match ip address 1
+R5(config-route-map)#set tag 200
+R5(config)#route-map TAG_EIGRP_TO_OSPF permit 20
+R5(config)#router-ospf 1
+R5(config)#redistribute eigrp 1 subnets route-map TAG_EIGRP_TO_OSPF
+```
+
+You can confirm that the route is being tagged by issuing `show ip ospf database`
+```
+R4#show ip ospf database
+Type-5 AS External Link States
+150.1.1.0       10.10.4.4       67          0x80000003 0x008E0B `100`
+
+R5#show ip ospf database
+Type-5 AS External Link States
+150.1.1.0       10.10.3.5       6           0x80000001 0x006BB7 `200`
+150.1.1.0       10.10.4.4       67          0x80000003 0x008E0B `100`
+```
+
+R5 has both routes and route tags, one from himself, and one from R4 because he got advertisement from OSPF for OE2 routes which were redistributed from EIGRP into OSPF. Once he got the advertisement first, he removes the EIGRP external route for 150.1.1.0/24 network from routing table and installs the OE2 route. Because of this he cannot advertise the OE2 route to R4. We explained this previously in the last post.
+
+After we implemented tagging for routes coming into the OSPF, now we must prevent those routes from being redistributed back into the EIGRP based on their tags. On R4 we will prevent routes with tag 200, and on R5 we will prevent with tag 100. We will do this using route-maps again, and then inserting it into redistribution process.
+
+First we must match the tag with deny statement, and in seq 20 permit all other routes. After that we insert the route-map in the eigrp process, saying to redistribute ospf routes with the route-map we just created which denies the routes with specified tag.
+
+```
+R4(config)#route-map OSPF_INTO_EIGRP deny 10
+R4(config-route-map)#match tag 200
+R4(config)#route-map OSPF_INTO_EIGRP permit 20
+R4(config)#router eigrp 1
+R4(config)#redistribute ospf 1 metric 100000 1 255 1 1500 route-map OSPF_INTO_EIGRP
+
+R5(config)#route-map OSPF_INTO_EIGRP deny 10
+R5(config-route-map)#match tag 100
+R5(config)#route-map OSPF_INTO_EIGRP permit 20
+R5(config)#router eigrp 1
+R5(config)#redistribute ospf 1 metric 100000 1 255 1 1500 route-map OSPF_INTO_EIGRP
+```
+
+We used deny statement for the routes that match the tags, and in seq 20 we permited all other routes.
+
+Now back on R3 you can confirm that the matched route for 150.1.1.0/24 was not redistributed from OSPF into the EIGRP, based on what we've just accomplished. We told R4 to not redistribute route 150.1.1.0/24 coming from R5 (tag 200), and to R5 we told not to redistribute route 150.1.1.0/24 coming from R4 (tag 100).
+
+```
+R3#show ip route
+D EX     150.1.1.0 [170/26112] via 10.10.1.2, 00:09:22, GigabitEthernet2/0
+```
+
+I hope you found this post helpfull, thank you for the reading and see you on the next one! All the best!
 
 
   
