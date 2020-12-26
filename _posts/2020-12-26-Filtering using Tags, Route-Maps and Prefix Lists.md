@@ -34,7 +34,7 @@ router eigrp 1
  ```
  
 Now route 150.1.1.0/24 would be redistributed from OSPF to EIGRP and R3 would have two (or three ways, remember the previous post) to reach
-the destination. He would use either the route through R2 or R4/R5, depending on the metric that was calculated during the redistributio.
+the destination. He would use either the route through R2 or R4/R5, depending on the metric that was calculated during the redistribution.
  
 ### R3 Routing table and Topology table
  
@@ -83,7 +83,7 @@ We can resolve those issues by using three examples: Lowering the AD, Filtering 
 # LOWERING THE ADMINISTRATIVE DISTANCE
 
 One way to deal with this issue is by lowering the `AD` of the EIGRP external routes on R4 and R5, that way they will always be more prefered than the OSPF routes.
-Lets test it out by changing AD on R4 and R5: the command is The command #distance eigrp "internal" "external".
+Lets test it out by changing AD on R4 and R5: the command is "distance eigrp "internal" "external""
 
 ```
 R4(config)#router eigrp 1
@@ -126,7 +126,7 @@ R5(config)#router ospf 1
 R5(config-router)#distribute-list prefix DENY_150.1.1.0 in
 ```
 
-With the command `distribute-list prefix DENY_150.1.1.0 in` we filterd the 150.1.1.0/24 network from being installed from the OSPF database into the routing table by using the keyword `IN` at the end of the command.
+With the command `distribute-list prefix DENY_150.1.1.0 in` we filterd the 150.1.1.0/24 network from being installed from the OSPF database into the routing table by using the keyword `IN` at the end of the command. Also remember to permit all other routes, which is what seq 20 is doing.
 
 Prove it by checking the routing table:
 
