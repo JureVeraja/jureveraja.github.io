@@ -65,6 +65,7 @@ For R2 configuration is the same except the networks that are advertised are: 20
 
 ### R3
 
+```
 R3(config)#key chain eigrp_key
 R3(config-keychain)#key 1
 R3(config-keychain-key)#key-string LAB
@@ -82,6 +83,7 @@ R3(config)#router eigrp EIGRP
 R3(config-router)#address-family ipv4 autonomous-system 1
 R3(config-router-af)#network 30.30.30.0 255.255.255.0
 R3(config-router-af)#network 40.40.40.0 255.255.255.0
+```
 
 # Influencing EIGRP Metric - Choosing the prefered route
 
