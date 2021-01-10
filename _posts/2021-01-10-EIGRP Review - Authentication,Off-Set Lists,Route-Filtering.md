@@ -195,6 +195,95 @@ D        160.1.1.0 [90/2575360] via 40.40.40.1, 00:00:38, GigabitEthernet1/0
 
 And the route is back. It is because we multiplied this metric from our successor by x2: P 150.1.1.0/24, 1 successors, FD is 329646080. And comparing that to metric through R1 329647080 we can see that R1 metric would be significantly lower, that way we are satisfying the rule of Unequal cost, and it can be installed in the routing table.
 
+# ROUTE FILTERING
+
+For route filtering in EIGRP we use `distribute-list` which can be refering to ACL, prefix-list or route-map for matching of the routes we want to filter.
+
+Lets start by creating a distribute list which is referencing an ACL.
+We will keep the same idea as we did above, lets filter the 150.1.1.0/24 from coming out of R1 so R3 doesn't know about it and will use the other path through R2.
+
+### Filtering using ACL 
+```
+R1(config)#ip access-list standard 1
+R1(config-std-nacl)#deny 150.1.1.0 0.0.0.255
+R1(config-std-nacl)#permit any
+--------------------------------------------
+R1(config)#router eigrp EIGRP
+R1(config-router)#address-family ipv4 autonomous-system 1
+R1(config-router-af)#topology base
+R1(config-router-af-topology)#distribute-list 1 out
+```
+
+When using ACL, you use DENY statement for routes you wan't to deny with distribute-list and permit all other. In distribute-list we used `OUT` statement for the routes that match ACL 1 apply the statements OUTBOUND.
+
+Confirm by checking the routing table on R3:
+
+```
+R3#show ip route
+      150.1.0.0/24 is subnetted, 1 subnets
+D        150.1.1.0 [90/2575360] via 40.40.40.1, 00:00:54, GigabitEthernet1/0
+      160.1.0.0/24 is subnetted, 1 subnets
+D        160.1.1.0 [90/2575360] via 40.40.40.1, 00:03:29, GigabitEthernet1/0
+                   [90/2575367] via 30.30.30.1, 00:03:29, GigabitEthernet2/0
+```
+
+### Filtering using Prefix-List
+
+Now we remove the previous distribute-list and we create a new one:
+
+```
+R1(config)#ip prefix-list DENY_150.1.1.0/24 deny 150.1.1.0/24
+R1(config)#ip prefix-list DENY_150.1.1.0/24 seq 20 permit 0.0.0.0/0 le 32
+-------------------------------------------------------------------------
+R1(config)#router eigrp EIGRP
+R1(config-router)#address-family ipv4 autonomous-system 1
+R1(config-router-af)#topology base
+R1(config-router-af-topology)#distribute-list prefix DENY_150.1.1.0/24 out
+```
+Here basically everything is similar as with ACL, except instead of permit any here you must specify 0.0.0.0/0 le 32, meaning all routes that are equal to /32 or less than /32.
+The outcome of the routing table is the same, you can test it yourself.
+
+### Filtering using Route-Maps
+
+When using the route-maps logic kind of changes,and it can be confusing sometimes. Lets start by using ACL in combination with route-map:
+
+```
+R1(config)#access-list 1 permit 150.1.1.0 0.0.0.255
+-------------------------------------------------
+R1(config)#route-map DENY_150.1.1.0/24 deny 10
+R1(config-route-map)#match ip address 1
+R1(config)#route-map DENY_150.1.1.0/24 permit 20
+------------------------------------------------
+R1(config)#router eigrp EIGRP
+R1(config-router)#address-family ipv4 autonomous-system 1
+R1(config-router-af)#topology base
+R1(config-router-af-topology)#distribute-list route-map DENY_150.1.1.0/24 out
+```
+
+In this example, we used a PERMIT statement in the ACL, it basically means ACL is permited to do anything that route-map wanted. And when we look at route-map config, it said DENY all routes that match the ACL 1 as we can see on sequence 10.
+
+You must not forget the sequence 20 route-map part, because otherwise you would deny all routes since there is an invisible deny statement. So creating an empty route-map with the next sequence number , in our case 20, and just using the permit statement will permit all other routes.
+
+Here is where it gets confusing:
+
+If you used deny in ACL and deny in route-map, what would happen is when the route-map checked sequence 10, found a match for ACL 1 and saw a deny statement in ACL which means "move to the next route-map sequence" it would just ignore it, and move to the sequence 20, and sequence 20 would permit all routes, meaning nothing would get filtered.
+
+So to conclude a DENY in ACL means - move to the next route-map sequence. Remember that.
+
+We get same result as before:
+```
+R3#show ip route
+      150.1.0.0/24 is subnetted, 1 subnets
+D        150.1.1.0 [90/2575360] via 40.40.40.1, 00:00:54, GigabitEthernet1/0
+      160.1.0.0/24 is subnetted, 1 subnets
+D        160.1.1.0 [90/2575360] via 40.40.40.1, 00:03:29, GigabitEthernet1/0
+                   [90/2575367] via 30.30.30.1, 00:03:29, GigabitEthernet2/0
+```
+
+Theres many ways you can play with route filtering. With this we conclude that topic for now.
+
+# EIGRP STUB
+
 
 
 
