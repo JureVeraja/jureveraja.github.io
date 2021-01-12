@@ -342,7 +342,7 @@ D        160.1.1.0 [90/2570240] via 20.20.20.1, 01:01:33, GigabitEthernet2/0
 ```
 
 
-It lost the route to 170.1.1.0/24 network because BRANCH router is now a STUB router and is not advertising any outside networks, this is the problem you need to be carefull about. 
+It lost the route to 170.1.1.0/24 network because BRANCH router is now a STUB router and is not advertising any networks he learned from eigrp peers, this is the problem you need to be carefull about. 
 If you check the routing table on BRANCH_2 you would also see that it lost all routes to the outside.
 
 We can also see how R2 sees BRANCH router as a stub with this command:
