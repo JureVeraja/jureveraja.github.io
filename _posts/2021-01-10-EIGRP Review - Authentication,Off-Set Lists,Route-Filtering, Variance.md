@@ -284,11 +284,84 @@ Theres many ways you can play with route filtering. With this we conclude that t
 
 # EIGRP STUB
 
+Here we will be introducing an EIGRP concept of `STUB` router. EIGRP stub router does not advertise routes that it learnes from other EIGRP peers. It advertises by default only connected and summary routes, but it can be configured to receive or advertise whatever combination we want (redistributed routes,connected or summary routes). 
+
+STUB router is usefull and most often used at branch locations or remote sites that do not have large number or routers or networks, and because those routers are usually on the WAN edge and by implementing the STUB router we are limiting our `QUERY` domain, meaning when some route to reach x.x.x.x network goes active in the EIGRP topology table, that router will start sending Queries to neighboring routers asking if anyone got a route to reach x.x.x.x network. 
+This way if we dont want our query to reach so far as our branch is, we can limit that by making branch routers EIGRP STUBs. They tell their neighbor's in the hello packet that they are STUBs and they wont receive queries from neighbors.
+
+Important thing to consider is , if there's other networks behind STUB router, remember that by default it doesn't advertise them.
+
+Lets check the configuration on our BRANCH router and the routes it learned:
+
+```
+BRANCH#show ip route
+      50.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C        50.50.50.0/24 is directly connected, GigabitEthernet3/0
+L        50.50.50.2/32 is directly connected, GigabitEthernet3/0
+      60.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C        60.60.60.0/24 is directly connected, GigabitEthernet1/0
+L        60.60.60.1/32 is directly connected, GigabitEthernet1/0
+      150.1.0.0/24 is subnetted, 1 subnets
+D        150.1.1.0 [90/2575360] via 50.50.50.1, 00:00:12, GigabitEthernet3/0
+      160.1.0.0/24 is subnetted, 1 subnets
+D        160.1.1.0 [90/2575360] via 50.50.50.1, 00:00:12, GigabitEthernet3/0
+      170.1.0.0/24 is subnetted, 1 subnets
+D        170.1.1.0 [90/10880] via 60.60.60.2, 00:00:28, GigabitEthernet1/0
+```
+
+To shorten the table, we will display only important routes, that is the neighbors routes and routes from NET. The same thing can be seen on the BRANCH_2 router. As we can see all is well.
+
+Now lets check the routes on R2 to prove that he is receiving the route for network 170.1.1.0/24 from BRANCH_2.
+
+```
+R2(config)#do sh ip route
+      150.1.0.0/24 is subnetted, 1 subnets
+D        150.1.1.0 [90/2575360] via 50.50.50.1, 00:08:20, GigabitEthernet3/0
+      160.1.0.0/24 is subnetted, 1 subnets
+D        160.1.1.0 [90/2575360] via 50.50.50.1, 00:08:20, GigabitEthernet3/0
+      170.1.0.0/24 is subnetted, 1 subnets
+D        170.1.1.0 [90/16000] via 50.50.50.2, 00:07:53, GigabitEthernet3/0
+```
+
+As we can see he is indeed receiving the routes from BRANCH routers. Now lets make our BRANCH router a STUB router, lets see what will happen.
+
+```
+BRANCH(config)#router eigrp EIGRP
+BRANCH(config-router)#address-family ipv4 autonomous-system 1
+BRANCH(config-router-af)#eigrp stub
+```
+
+After making BRANCH a stub router neighborship gets reset and check the routing table on R2:
+
+```
+R2#show ip route
+      150.1.0.0/24 is subnetted, 1 subnets
+D        150.1.1.0 [90/2570240] via 20.20.20.1, 01:01:33, GigabitEthernet2/0
+      160.1.0.0/24 is subnetted, 1 subnets
+D        160.1.1.0 [90/2570240] via 20.20.20.1, 01:01:33, GigabitEthernet2/0
+```
 
 
+It lost the route to 170.1.1.0/24 network because BRANCH router is now a STUB router and is not advertising any outside networks, this is the problem you need to be carefull about. 
+If you check the routing table on BRANCH_2 you would also see that it lost all routes to the outside.
 
+We can also see how R2 sees BRANCH router as a stub with this command:
 
+```
+R2#show ip eigrp neighbors  detail
+EIGRP-IPv4 VR(EIGRP) Address-Family Neighbors for AS(1)
+H   Address                 Interface              Hold Uptime   SRTT   RTO  Q  Seq
+                                                   (sec)         (ms)       Cnt Num
+2   50.50.50.2              Gi3/0                    12 00:11:41   85   510  0  42
+   Version 11.0/2.0, Retrans: 0, Retries: 0, Prefixes: 1
+   Topology-ids from peer - 0 
+   Stub Peer Advertising (CONNECTED SUMMARY ) Routes
+   Suppressing queries
+```
 
+There's a way to resolve this issue in newer versions of IOS, since im labbing this on IOS 15.2 i dont have the command to achieve that, its called EIGRP stub site feature. But basically the resolution is to make BRANCH router recognize which interfaces are WAN and which are LAN. And then EIGRP stub site feature allows STUB router to advertise itself as a stub to peers ONLY on the WAN interfaces but allow it to exchange routes learned on LAN interfaces. There's more details about this so you can research it incase you ever implement EIGRP stubs.
+
+Thank you for reading, and see you on the next one! All the best!
 
 
 
