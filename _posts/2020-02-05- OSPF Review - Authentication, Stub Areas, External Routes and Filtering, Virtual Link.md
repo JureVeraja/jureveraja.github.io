@@ -375,11 +375,11 @@ Link ID         ADV Router      Age         Seq#       Checksum Tag
 100.100.100.0   200.200.200.1   819         0x80000002 0x00EE28 0
 200.200.200.0   10.1.46.4       891         0x80000001 0x005061 0
 ```
-R1#show ip route
 
 And lastly lets check how R1 receives the route to 200.200.200.0/24:
 
 ```
+R1#show ip route
       100.0.0.0/24 is subnetted, 1 subnets
 O E2     100.100.100.0 [110/20] via 10.0.13.3, 00:45:46, GigabitEthernet3/0
 O E2  200.200.200.0/24 [110/20] via 10.0.14.4, 00:13:54, GigabitEthernet2/0
