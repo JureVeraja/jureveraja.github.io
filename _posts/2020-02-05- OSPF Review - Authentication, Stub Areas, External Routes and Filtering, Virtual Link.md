@@ -8,7 +8,7 @@ math: true
 ---
 Here's the topology we will be using for our OSPF configurations.
 
-![ospf_topo](/assets/img/sample/ospf_topo.png
+![ospf_topo](/assets/img/sample/ospf_topo.png)
 
 
 Just to point out I won’t go into details about every LSA type, but we will describe them as we go, especially external ones.
