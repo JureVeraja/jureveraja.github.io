@@ -208,7 +208,7 @@ Altough you must be carefull when you’re creating distribute-list when you hav
 
 # OSPF DEFAULT ROUTE
 
-You can inject default route in OSPF by using ` default information originate | always` command.
+You can inject default route in OSPF by using `default information originate | always` command.
 The command would look at your routing table and check if you have any default routes (0.0.0.0), static or from some other source and it would inject it into the ospf domain (all ospf routers would receive it,in all areas) as Type 5 external LSA. You can also add the “always” keyword so the default route gets advertised even if you don’t have a default route yourself, in that case all other routers would receive 0.0.0.0 and next-hop would be you.
 
 It is advertised as External Type 5 route with type 2 submetric, as we know external routes can be type-1 or type-2. Type 2 means that metric doesn’t change along the way, it stays the same, in case of default routes it is 1. Important note is that type 2 external routes are usually advertised with metric of 20! But default-route is advertised with metric of 1.
