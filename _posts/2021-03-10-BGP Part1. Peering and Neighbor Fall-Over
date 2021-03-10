@@ -7,22 +7,33 @@ tags: [bgp]
 math: true
 ---
 
-
 ![rack](/assets/img/sample/rack.png)
+
 
 ![bgp_topology](/assets/img/sample/bgp_topology.png)
 
-This time i decided to do something different, i had some spare equipment at work, so i installed it in the rack and made a quick topology. As you can see the equipment consists of various devices, like 800 router, ASR920, Catalyst3560/3750 etc. So we will make the most of it.
+This time i decided to do something different, i had some spare equipment at work, so i installed it in the rack and made a quick topology. As you can see the equipment 
+consists of various devices, like 800 router, ASR920, Catalyst3560/3750 etc. So we will make the most of it.
 
-I won’t be talking about BGP messages and neighbor states in here, I will only be doing the configurations and labbing. To fully understand what’s going on behind the scenes, it is recommended to read up on various BGP messages and FSM (finite-state machine) that BGP uses to maintain its peer table.
+I won’t be talking about BGP messages and neighbor states in here, I will only be doing the configurations and labbing. 
+To fully understand what’s going on behind the scenes, it is recommended to read up on various BGP messages and FSM (finite-state machine) that BGP uses to 
+maintain its peer table.
+
 # eBGP PEERING 
-For eBGP we will do peering between R1-R2 and R1-R6. For R1-R2 we will use directly connected method of peering using interface ip addresses. And on the other side between R5-R7, R3-R7, and R6-R7. Remember for BGP peering you can’t use default routes, for IP reachability you have to have a route to the peer you’re trying to establish neighborship. For eBGP you have to have a connected route to other peer otherwise TCP connection won’t even start.
+For eBGP we will do peering between R1-R2 and R1-R6. For R1-R2 we will use directly connected method of peering using interface ip addresses. 
+And on the other side between R5-R7, R3-R7, and R6-R7. Remember for BGP peering you can’t use default routes, for IP reachability you have to have a route to the peer
+you’re trying to establish neighborship. For eBGP you have to have a connected route to other peer otherwise TCP connection won’t even start.
 
-For R1-R6 we will imagine there is some transit networks between them and they are not directly connected. In this case we will use eBGP multihop peering or in our case feature called `ttl-security`. This is a feature that is implemented for BGP security so unknown peers or attackers can’t attempt to establish neighborship with us , its another way of telling the router to peer only with peers that are “x “ hop’s away. Since eBGP TTL is 1, and unless you specify that your neighbor is multiple hops away, and increase TTL the peering will fail.
+For R1-R6 we will imagine there is some transit networks between them and they are not directly connected. 
+In this case we will use eBGP multihop peering or in our case feature called `ttl-security`. 
+This is a feature that is implemented for BGP security so unknown peers or attackers can’t attempt to establish neighborship with us , 
+its another way of telling the router to peer only with peers that are “x “ hop’s away. 
+Since eBGP TTL is 1, and unless you specify that your neighbor is multiple hops away, and increase TTL the peering will fail.
 You could also use `ebgp-multihop` command which also allows you to start tcp and bgp session to neighbors that are not directly connected.
 
 You can also peer to external neighbor if he is not directly connected with inserting command `neighbor x.x.x.x disable-connected-check` BUT only if he is 1 hop away. It automatically sets TTL to 1.
 In our case we’ve chosen ttl-security and configuration for eBGP will be:
+
 ```
 R1#show run | b router bgp
 router bgp 111
@@ -57,7 +68,8 @@ Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State
 10.61.61.6      4          333      98     108        4    0    0 01:35:25        0
 10.21.21.2      4          222      99     110        4    0    0 01:35:20        0
 ```
-Since we’re doing normal eBGP peering between router’s that peer with R7 i won’t be showing the config because its simple and same as we showed for R2. You can also do the authentication between the neighbors by using the command `neighbor x.x.x.x password` for additionaly security.
+Since we’re doing normal eBGP peering between router’s that peer with R7 i won’t be showing the config because its simple and same as we showed for R2. 
+You can also do the authentication between the neighbors by using the command `neighbor x.x.x.x password` for additionaly security.
 
 # iBGP Peering
 
@@ -99,6 +111,7 @@ router bgp 222
  neighbor 192.168.5.1 remote-as 222
  neighbor 192.168.5.1 update-source Loopback0
  ```
+ 
 Now we can test if the BGP process will go to a “down” state. Let’s shut down the interface F1/0/3 on R2 leading towards R3.
 
 ```
