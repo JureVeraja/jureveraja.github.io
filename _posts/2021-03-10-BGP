@@ -1,0 +1,166 @@
+---
+title: OSPF Review - Authentication, Stub Areas, LSA's, Route Filtering, Virtual Link
+author: Jure Veraja
+date: 2021-03-10 09:15:00 +0100
+categories: [ccnp]
+tags: [bgp]
+math: true
+---
+
+![bgp_topology](/assets/img/sample/bgp_topology.png)
+
+This time i decided to do something different, i had some spare equipment at work, so i installed it in the rack and made a quick topology. As you can see the equipment consists of various devices, like 800 router, ASR920, Catalyst3560/3750 etc. So we will make the most of it.
+
+I won’t be talking about BGP messages and neighbor states in here, I will only be doing the configurations and labbing. To fully understand what’s going on behind the scenes, it is recommended to read up on various BGP messages and FSM (finite-state machine) that BGP uses to maintain its peer table.
+# eBGP PEERING 
+For eBGP we will do peering between R1-R2 and R1-R6. For R1-R2 we will use directly connected method of peering using interface ip addresses. And on the other side between R5-R7, R3-R7, and R6-R7. Remember for BGP peering you can’t use default routes, for IP reachability you have to have a route to the peer you’re trying to establish neighborship. For eBGP you have to have a connected route to other peer otherwise TCP connection won’t even start.
+
+For R1-R6 we will imagine there is some transit networks between them and they are not directly connected. In this case we will use eBGP multihop peering or in our case feature called `ttl-security`. This is a feature that is implemented for BGP security so unknown peers or attackers can’t attempt to establish neighborship with us , its another way of telling the router to peer only with peers that are “x “ hop’s away. Since eBGP TTL is 1, and unless you specify that your neighbor is multiple hops away, and increase TTL the peering will fail.
+You could also use `ebgp-multihop` command which also allows you to start tcp and bgp session to neighbors that are not directly connected.
+
+You can also peer to external neighbor if he is not directly connected with inserting command `neighbor x.x.x.x disable-connected-check` BUT only if he is 1 hop away. It automatically sets TTL to 1.
+In our case we’ve chosen ttl-security and configuration for eBGP will be:
+```
+R1#show run | b router bgp
+router bgp 111
+ neighbor 10.21.21.2 remote-as 222
+ neighbor 10.61.61.6 remote-as 333
+ neighbor 10.61.61.6 ttl-security hops 2
+ ```
+
+Notice the `ttl-security hops 2` command we were talking about, this way we increased TTL to 2. Example of config on R2.
+
+```
+R2#show run | b router bgp
+router bgp 222
+ neighbor 10.21.21.1 remote-as 111
+```
+
+For peering side that is multiple hops away you also have to increase the TTL, like we did on R4:
+
+```
+R6#show run | b router bgp
+router bgp 333
+ neighbor 10.61.61.1 remote-as 111
+ neighbor 10.61.61.1  ttl-security hops 2
+ neighbor 10.67.67.7 remote-as 444
+```
+
+To verify BGP neighborship:
+
+```
+R1#show ip bgp summary
+Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+10.61.61.6      4          333      98     108        4    0    0 01:35:25        0
+10.21.21.2      4          222      99     110        4    0    0 01:35:20        0
+```
+Since we’re doing normal eBGP peering between router’s that peer with R7 i won’t be showing the config because its simple and same as we showed for R2. You can also do the authentication between the neighbors by using the command `neighbor x.x.x.x password` for additionaly security.
+
+# iBGP Peering
+
+For iBGP peering we’ve chosen peering via Loopback interfaces. Why? Because it is the best and safest method of peering inside an organization or datacenter because you can have redundant links towards your peer, and loopback interface will stay in the up/up even if one of the physical interface towards your neighbor fails. You will still have reachability towards your neighbors loopback via some other neighbor. You see that let’s say from R2 perspective you can reach R3 via F1/0/3 and F1/0/4 which leads to R4.
+
+We make this happen by advertising loopbacks into some other IGP protocol, like OSPF in our example. You do not need to be directly connected in iBGP , you can reach the peer via IGP. That way everybody has everybody’s loopbacks in their routing table. Just to note iBGP TTL is 255. Let’s see an example of configuration:
+
+```
+R2#show run | b router ospf
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.2.0 0.0.0.255 area 0
+!
+router bgp 222
+ neighbor 10.21.21.1 remote-as 111
+ neighbor 192.168.3.1 remote-as 222
+ neighbor 192.168.3.1 update-source Loopback0
+ neighbor 192.168.4.1 remote-as 222
+ neighbor 192.168.4.1 password test
+ neighbor 192.168.4.1 update-source Loopback0
+ neighbor 192.168.5.1 remote-as 222
+ neighbor 192.168.5.1 update-source Loopback0
+```
+
+As you can see we first advertised our loopback into the OSPF process, and then an important point to add is you specify neighbor’s loopback address to peer, not the physical address on the interface! But that is not enough, because if you forgot to insert `neighbor x.x.x.x update-source Loopback` , your outgoing BGP messages would use the address of the outgoing interface, in that case the peering would fail, because your peer is expecting the messages to come from your loopback. As we can see :
+
+```
+R4#show run | b router ospf
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+ network 192.168.4.0 0.0.0.255 area 0
+!
+router bgp 222
+ neighbor 192.168.2.1 remote-as 222
+ neighbor 192.168.2.1 password test
+ neighbor 192.168.2.1 update-source Loopback0
+ neighbor 192.168.3.1 remote-as 222
+ neighbor 192.168.3.1 update-source Loopback0
+ neighbor 192.168.5.1 remote-as 222
+ neighbor 192.168.5.1 update-source Loopback0
+ ```
+Now we can test if the BGP process will go to a “down” state. Let’s shut down the interface F1/0/3 on R2 leading towards R3.
+
+```
+R2(config-router)#int f1/0/3
+R2(config-if)#shut
+%OSPF-5-ADJCHG: Process 1, Nbr 192.168.3.1 on FastEthernet1/0/3 from 2WAY to DOWN, Neighbor Down: Interface down or detached
+```
+
+As we can see, the OSPF neighborship went down, but let’s examine the routing table after that:
+
+```
+R2#show ip route
+     192.168.5.0/32 is subnetted, 1 subnets
+O       192.168.5.1 [110/3] via 10.24.24.4, 00:00:09, FastEthernet1/0/4
+     192.168.2.0/32 is subnetted, 1 subnets
+C       192.168.2.1 is directly connected, Loopback0
+     192.168.3.0/32 is subnetted, 1 subnets
+O       192.168.3.1 [110/4] via 10.24.24.4, 00:00:21, FastEthernet1/0/4
+     192.168.4.0/32 is subnetted, 1 subnets
+O       192.168.4.1 [110/2] via 10.24.24.4, 00:00:09, FastEthernet1/0/4
+```
+
+We still have the route to R3’s loopback and now its via R4. BGP stayed in the up state:
+
+```
+R2#show ip bgp sum
+Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+10.21.21.1      4   111    1248    1124        4    0    0 18:50:18        3
+192.168.3.1     4   222    1114    1107        4    0    0 18:30:02        0
+192.168.4.1     4   222    1121    1128        4    0    0 18:26:02        0
+192.168.5.1     4   222      36      39        4    0    0 00:34:55        0
+```
+
+This is why you should peer using loopback addresses advertised into the IGP, it gives you resiliency. 
+
+# BGP Failure Detection
+
+If your BGP neighbors are directly connected, BGP would detect the link failure almost immediately, but what if they are multiple hops away? Then they would rely on their BGP holddown timer which is by default 180seconds. So let’s say the link between R1 and transit is down, R6 would not know about it and would still be pointing to R1 for the routes he has. This is a problem, because we need faster failover.
+
+Adjusting the timers for the BGP process is not a good idea, because BGP inserts the timers into TCP and then communicates with other router. So if you adjust timers to lets say 1 second, router would be doing TCP retransmissions every second and waiting for TCP ack’s. That would take more CPU, especially if you have more neighbors.
+
+Instead it is better to use several other options ( `BGP fast peering session deactivation` ) we have which do not affect CPU:
+
+### Neighbor Fall-Over
+
+We have couple of options here, first one is using `neighbor x.x.x.x fall-over` which tracks IP reachability
+Using IGP route to BGP peer. When route is lost, peer is taken down. It doesn’t work if you have a default route. Also main problem with this command is it will look at any routes you have to reach that neighbor, whether its aggregated route or normal route, and if your main route fails, and let’s say you have aggregated route left to that neighbor, as far as your router is concerned you can still reach your peer. But BGP rule is you can’t peer using default route or aggregate address. So in this case failover wouldn’t happen and you would have to wait for BGP timer to expire.
+
+Instead it is better to use neighbor fall-over in combination with route-map that tracks the next-hop for that route. You track the route you want to reach that peer, match it in route-map and if that route goes down failover will happen.
+
+Those solutions we mentioned would not work if we used indirect peering. So to solve the problem of detecting if some remote link failed we use BFD `Bidirectional forwarding detection` which doesn’t affect CPU and we can insert the timers we want. It uses echo packets which tests forwarding path to that peer.
+
+In our case if you shut down the link between R1 – R6, they would wait the holddown timer to expire before noticing that BGP sessions is down. Let’s show the example of BFD configuration:
+
+```
+R1(config)#int fa2
+R1(config-if)#bfd interval 200 min_rx 300 multiplier 3 
+R1(config)#router bgp 111
+R1(config-router)#neighbor 10.61.61.6 fall-over bfd
+-----------------------------------------------------------------
+R6(config)#int f0/1
+R6(config-if)#bfd interval 500 min_rx 100 multiplier 3 
+R6(config)#router bgp 333
+R6(config-router)#neighbor 10.61.61.1 fall-over bfd
+```
+Be carefull when assigning bfd values. Interval is equal how fast the router will send the echo packet, but min_rx is how often he is able to receive the echo packet. Multiple value means that the Router will consider other neighbor dead after 3 times min_rx value. If you let’s say configured on R4 interval to 100, it wouldn’t work because R1 is min_rx to 300, and they would during negotiation set up to use 300ms.
+
+That’s it for Part 1. See you on the next one. Thank you for reading!
