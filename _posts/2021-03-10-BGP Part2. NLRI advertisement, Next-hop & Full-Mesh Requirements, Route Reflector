@@ -1,0 +1,218 @@
+---
+title: BGP Part2. NLRI advertisement, Next-hop & Full-Mesh Requirements, Route Reflector
+author: Jure Veraja
+date: 2021-04-12 13:15:00 +0100
+categories: [ccnp]
+tags: [Route Reflector]
+math: true
+---
+
+![bgp_topology](/assets/img/sample/bgp_topology.png)
+
+We will use the same topology as in previous BGP post.
+
+In this part we will be advertising some networks and see how BGP behaves.
+
+# Injecting Routes into BGP
+
+Network command in BGP is different than IGP. It does not use network command to find interfaces which have that network and activate it, 
+instead it is searching the routing table for that exact prefix and mask and then advertises it. I’ve created some loopback’s on R1 and advertised it, Example:
+
+```
+R1:
+interface Loopback1
+ ip address 150.0.0.1 255.255.255.0
+interface Loopback2
+ ip address 160.0.0.1 255.255.255.0
+router bgp 111
+ network 150.0.0.0 mask 255.255.255.0
+ network 160.0.0.0 mask 255.255.255.0
+```
+
+Now we can check let’s say on R2 if he received those routes:
+
+```
+R2#show ip bgp
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 11.11.11.11/32   10.21.21.1               0             0 111 ?
+*> 150.0.0.0/24     10.21.21.1               0             0 111 i
+*> 160.0.0.0/24     10.21.21.1               0             0 111 i
+```
+
+He received them alright, notice the path AS and the origin type at the end. It says (i) which means R1 inserted this network with regular network command. 
+But you can also see the network 11.11.11.11/32 there, that’s the network I redistributed into the BGP, and you can see it has origin type (?), meaning somebody redistributed that network.
+
+On R1 I’ve created some random static route pointing to null0 and used `redistribute static` under BGP process:
+
+```
+ip route 11.11.11.11 255.255.255.255 Null0
+!
+router bgp 111
+ network 150.0.0.0 mask 255.255.255.0
+ network 160.0.0.0 mask 255.255.255.0
+ redistribute static
+```
+
+What about default routes and BGP? In BGP like other IGP’s redistributing static default or IGP default routes into BGP doesn’t work. 
+You have two ways: via network command (which requires you to have th e IGP default route installed from some other protocol), or via neighbor x.x.x.x default-originate command.
+
+Let’s see it in action:
+
+```
+R1(config)#router bgp 111
+R1(config-router)#neighbor 10.21.21.2 default-originate
+--------------------------------------------------------------------------
+R2#clear ip bgp * soft
+R2#show ip bgp        
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 0.0.0.0          10.21.21.1                             0            111 i
+*> 11.11.11.11/32   10.21.21.1               0             0 111 ?
+*> 150.0.0.0/24     10.21.21.1               0             0 111 i
+*> 160.0.0.0/24     10.21.21.1               0             0 111 i
+```
+
+And as you can see you have the default route now. I won’t be doing the first method where you need IGP but feel  free to test it out.
+
+# iBGP Full-Mesh and Next-Hop Problems
+
+iBGP uses AS-Path attribute to detect routing loops. That is why it is preferred to have a full-mesh of iBGP peers inside an organization. 
+If you do not have full-mesh, iBGP peer which receives some routes from eBGP peer can’t forward those routes inside to other iBGP peers. Because AS-Path is the same and routes would be discarded.
+
+To deal with this you have to full mesh your routers so they share all of the routes. We have other options (Route Reflectors) we will talk about later.
+
+For this example ill remove the neighborship between R2-R5 so we see the behavior of iBGP. After we’ve checked R2 routing table we’ve seen that R2 received routes from R1, but what happens next? 
+Let’s see if R2 forwarded those routes to R3/R4.
+
+```
+R3#show ip bgp
+   Network          Next Hop            Metric LocPrf Weight Path
+*>i11.11.11.11/32   10.21.21.1               0    100      0 111 ?
+*>i150.0.0.0/24     10.21.21.1               0    100      0 111 i
+*>i160.0.0.0/24     10.21.21.1               0    100      0 111 i
+R4#show ip bgp
+   Network          Next Hop            Metric LocPrf Weight Path
+*>i11.11.11.11/32   10.21.21.1               0    100      0 111 ?
+*>i150.0.0.0/24     10.21.21.1               0    100      0 111 i
+*>i160.0.0.0/24     10.21.21.1               0    100      0 111 i
+```
+
+As we can see they also received routes from R2. But guess who did not receive routes? R5 did not receive it because as we said in iBGP you have to have full mesh 
+neighborship otherwise because of loop prevention system inside BGP, when R5 sees an update coming from R3/R4 it will have AS-Path equal to “222” which is his own AS, and he will discard it.
+
+To fix it I will re-establish neighborship between R2-R5.
+
+```
+R5(config)#router bgp 222
+R5(config-router)#neighbor 192.168.2.1 remote-as 222
+R5(config-router)#neighbor 192.168.2.1 update-source l0
+```
+
+Now let’s check the bgp table and as we can see he received routes alright.
+
+```
+   Network          Next Hop            Metric LocPrf Weight Path
+*>i11.11.11.11/32   10.21.21.1               0    100      0 111 ?
+*>i150.0.0.0/24     10.21.21.1               0    100      0 111 i
+*>i160.0.0.0/24     10.21.21.1               0    100      0 111 i
+```
+
+Now we have the next issue ahead of us. Notice something strange? Check the next-hop of those networks, it says next-hop is R1. But can we reach R1?
+
+```
+R5#ping 10.21.21.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.21.21.1, timeout is 2 seconds:
+.....
+Success rate is 0 percent (0/5)
+```
+
+We can’t reach him, so here we have couple of options to fix this problem. We can either advertise the 10.21.21.0 network into the BGP, 
+assuming you’re using NAT at your router (R2) for the private addresses inside your enterprise otherwise the ISP (assuming R1) wouldn’t be able to reach you, 
+as you would be going out via private addresses so think about that.
+
+Or we can use the option `next-hop self` on R2 so all the router’s inside our enterprise will change next-hop to R2 to go out to reach those networks. 
+
+```
+R2(config)#router bgp 222
+R2(config-router)# neighbor 192.168.3.1 next-hop-self
+R2(config-router)# neighbor 192.168.4.1 next-hop-self
+R2(config-router)# neighbor 192.168.5.1 next-hop-self
+```
+
+Now let’s check the bgp table on R5:
+
+```
+R5#show ip bgp
+   Network          Next Hop            Metric LocPrf Weight Path
+*>i11.11.11.11/32   192.168.2.1              0    100      0 111 ?
+*>i150.0.0.0/24     192.168.2.1              0    100      0 111 i
+*>i160.0.0.0/24     192.168.2.1              0    100      0 111 i
+```
+
+As we can see now the next-hop is R2, and you should be able to reach the networks behind the R2, providing ur NAT-ing ur private address space towards the outside, 
+otherwise nobody could return traffic to you assuming we’re talking about exterior communication.
+
+# Route Reflectors
+
+Instead of using `next-hop self` option, we can configure one router to be `Route Reflector` , meaning he would forward/reflect routes to another iBGP peers called `Route reflector clients` . 
+
+Route Reflectors have couple of rules we will mention them briefly:
+
+-	If RR receives NLRI(network layer reachability information) from non-RR client, the RR would advertise the NLRI to an RR client but it would not advertise it to a non-RR client.
+-	If RR receives NLRI from RR client, it advertises it to RR clients and non-RR clients. 
+-	If RR receives a route from eBGP peer, it advertises the route to RR clients and non-RR clients
+
+In our case RR will be R3/R4 which are receiving routes from iBGP peer (R2). R2 is receiving routes from eBGP peer so in that case R2 can forward learned routes to R3/R4 , but R3/R4 as we’ve seen before can’t forward them to other iBGP peers cuz of iBGP rules. 
+Before making R3/R4 route reflector clients, we will remove neighborship R2-R5, this way we will verify that you do not need full-mesh in iBGP when you have Route Reflectors.
+
+```
+R2(config-router)#no neighbor 192.168.5.1 remote-as 222
+R2(config-router)#neighbor 192.168.3.1 route-reflector-client
+R2(config-router)#neighbor 192.168.4.1 route-reflector-client
+```
+
+Now let’s check the bgp table on R5:
+
+```
+R5#show ip bgp
+   Network          Next Hop            Metric LocPrf Weight Path
+*>i11.11.11.11/32   192.168.2.1              0    100      0 111 ?
+* i                 192.168.2.1              0    100      0 111 ?
+*>i150.0.0.0/24     192.168.2.1              0    100      0 111 i
+* i                 192.168.2.1              0    100      0 111 i
+*>i160.0.0.0/24     192.168.2.1              0    100      0 111 i
+* i                 192.168.2.1              0    100      0 111 i
+```
+
+Notice how for each network you have two ways to reach it, but next-hop is same and unchanged. So when R2 advertised routes to R3/R4, R3/R4 are Route Reflectors, they just continued advertising them to RR clients without changing the next-hop.
+
+We can dig alittle deeper to see who advertised us the specific route:
+
+```
+R5#show ip bgp 11.11.11.11
+BGP routing table entry for 11.11.11.11/32, version 177
+Paths: (2 available, best #1, table Default-IP-Routing-Table)
+Flag: 0x800
+  Not advertised to any peer
+  111
+    192.168.2.1 (metric 3) from 192.168.3.1 (192.168.3.1)
+      Origin incomplete, metric 0, localpref 100, valid, internal, best
+      Originator: 192.168.2.1, Cluster list: 192.168.3.1
+  111
+    192.168.2.1 (metric 3) from 192.168.4.1 (192.168.4.1)
+      Origin incomplete, metric 0, localpref 100, valid, internal
+      Originator: 192.168.2.1, Cluster list: 192.168.4.1
+```
+
+We can see that both R3/R4 which advertised us that specific network. And notice that we also see who’s the `originator` of the route in iBGP, which in the first place was R2.
+
+Also please note that for Route Reflectors to actually advertise/forward the received NLRI, they must be able to reach it or it’s next hop, it is not enough that they just have the entry in the BGP table.
+
+There’s many more details regarding Route reflectors and specific caveats regarding configuring it, so i encourage you to research further.
+
+Thanks for reading!
+
+
+
+
