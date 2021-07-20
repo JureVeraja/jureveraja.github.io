@@ -18,21 +18,17 @@ url: "https://jureveraja.github.io"
 
 author: Jure Veraja                  # change to your full name
 
-avatar: /assets/img/sample/picture.png   # support internet resources
+avatar: /assets/img/sample/jv.png   # support internet resources
 
 github:
   username: JureVeraja            # change to your github username
-
-twitter:
-  username: twitter_username            # change to your twitter username
 
 social:
   name: Jure Veraja                  # it will shows as the copyright owner in Footer
   email: verajajure@gmail.com             # change to your email address
   links:
     # The first element serves as the copyright owner's link
-    - https://twitter.com/username      # change to your twitter homepage
-    - https://github.com/JureVeraja      # change to your github homepage
+    # - https://github.com/JureVeraja      # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
     # - https://www.linkedin.com/in/username
