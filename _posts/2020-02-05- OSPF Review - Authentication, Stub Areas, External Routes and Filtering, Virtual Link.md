@@ -2,7 +2,7 @@
 title: OSPF Review - Authentication, Stub Areas, LSA's, Route Filtering, Virtual Link
 author: Jure Veraja
 date: 2021-02-05 18:15:00 +0100
-categories: [ccnp]
+categories: [networking]
 tags: [ospf]
 math: true
 ---
