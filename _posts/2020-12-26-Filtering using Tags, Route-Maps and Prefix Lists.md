@@ -2,7 +2,7 @@
 title: Filtering using Tags, Route-Maps and Prefix Lists
 author: Jure Veraja
 date: 2020-12-26 13:33:00 +0100
-categories: [ccnp]
+categories: [networking]
 tags: [tagging, route-maps]
 math: true
 ---
