@@ -15,12 +15,12 @@ I currently hold a couple of Networking Certificates including:
 
 Cisco CCNP Enterprise
 
-***Mikrotik (MTCNA)
+**Mikrotik (MTCNA)**
 
-Sonicwall Network Security Administrator
+**Sonicwall Network Security Administrator**
 
-Cambium Enterprise WiFi 
+**Cambium Enterprise WiFi** 
 
-Dell Networking Associate
+**Dell Networking Associate**
 
 I've decided to write about stuff as i learn and progress in my career. Hope you like the content and that you learn something. 
