@@ -66,8 +66,8 @@
 
   {% for entry in site.data.contact %}
     {% capture url %}
-     <!-- remove to see --> {%- if entry.type == 'github' -%}
-       <!-- remove to see --> https://github.com/{{ site.github.username }}
+     {%- if entry.type == 'github' -%}
+        https://github.com/{{ site.github.username }}
       {%- elsif entry.type == 'email' -%}
         {% assign email = site.social.email | split: '@' %}
         javascript:location.href = 'mailto:' + ['{{ email[0] }}','{{ email[1] }}'].join('@')
