@@ -15,7 +15,7 @@ I currently hold a couple of Networking Certificates including:
 
 Cisco CCNP Enterprise
 
-Mikrotik (MTCNA)
+***Mikrotik (MTCNA)
 
 Sonicwall Network Security Administrator
 
