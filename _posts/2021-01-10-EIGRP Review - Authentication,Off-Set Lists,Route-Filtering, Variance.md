@@ -2,7 +2,7 @@
 title: EIGRP Review - Authentication, Stub, Off-Set Lists, Route-Filtering, Variance
 author: Jure Veraja
 date: 2021-01-10 18:33:00 +0100
-categories: [ccnp]
+categories: [networking]
 tags: [eigrp]
 math: true
 ---
