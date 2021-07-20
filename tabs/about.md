@@ -13,7 +13,7 @@ I've switched from working as Navigational Officer in Merchant Navy to IT specif
 
 I currently hold a couple of Networking Certificates including:
 
-Cisco CCNP Enterprise
+**Cisco CCNP Enterprise**
 
 **Mikrotik (MTCNA)**
 
